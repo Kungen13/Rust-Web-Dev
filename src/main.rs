@@ -1,3 +1,6 @@
+use std::io::{Error, ErrorKind};
+use std::str::FromStr;
+
 #[derive(Debug)]
 struct Question {
     id: QuestionId,
@@ -22,7 +25,7 @@ impl Question {
     }
 }
 
-impl std::fmt::Display for Question {
+/*impl std::fmt::Display for Question {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         write!(
             f,
@@ -42,15 +45,26 @@ impl std::fmt::Debug for Question {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "{:?}", self.tags)
     }
+}*/
+
+impl FromStr for QuestionId {
+    type Err = std::io::Error;
+    fn from_str(id: &str) -> Result<Self, Self::Err> {
+        match id.is_empty() {
+            false => Ok(QuestionId(id.to_string())),
+            true => Err(
+                Error::new(ErrorKind::InvalidInput, "No id provided")
+            ),
+        }
+    }
 }
 
 fn main() {
     let question = Question::new(
-        QuestionId("1".to_string()),
+        QuestionId::from_str("1").expect("No id provided"),
         "First Question".to_string(),
         "Contents of question".to_string(),
         Some(vec!("faq".to_string())),
     );
     println!("{:?}", question);
 }
-//page 62 stop
