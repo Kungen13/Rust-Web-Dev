@@ -1,33 +1,43 @@
-mod question_f;
-mod api;
+mod handler;
+mod model;
+mod response;
+mod route;
 
-use question_f::*;
-use api::*;
-//use std::str::FromStr;
+//use axum::{response::IntoResponse, routing::get, Json, Router};
+use axum::http::{
+    header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
+    HeaderValue, Method,
+};
+use route::create_router;
+use tower_http::cors::CorsLayer;
 
-use axum::{response::IntoResponse, routing::get, Json, Router};
+/*pub async fn server_checker_handler() -> impl IntoResponse {
+    const MESSAGE: &str = "Server is up and running";
 
-/*async fn health_checker_handler() -> impl IntoResponse {
-    //(StatusCode::NOT_FOUND, "404 Not Found").into_response()
-    const MESSAGE: &str = "Build Simple CRUD API in Rust using Axum";
     let json_response = serde_json::json!({
-        "status": "success",
+        "status": "Success",
         "message": MESSAGE
     });
+
     Json(json_response)
 }*/
 
 #[tokio::main]
 async fn main() {
-    /*let question = Question::new(
-        "1".to_string(),
-        "First Question".to_string(),
-        "Contents of question".to_string(),
-        Some(vec!("faq".to_string())),
-    );*/
-    
-    let app = Router::new().route("/api/questions", get(api::get_questions));
+
+    /*let app = Router::new().route("/api/serverchecker", get(server_checker_handler));
     println!("Server started successfully");
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:8000").await.unwrap();
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:8000").await.unwrap();
+    axum::serve(listener, app).await.unwrap();*/
+    let cors = CorsLayer::new()
+        .allow_origin("http://localhost:3000".parse::<HeaderValue>().unwrap())
+        .allow_methods([Method::GET, Method::POST, Method::PATCH, Method::DELETE])
+        .allow_credentials(true)
+        .allow_headers([AUTHORIZATION, ACCEPT, CONTENT_TYPE]);
+
+    let app = create_router().layer(cors);
+
+    println!("Server started successfully");
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:8000").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
