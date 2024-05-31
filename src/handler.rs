@@ -5,11 +5,20 @@ use axum::{
     Json,
 };
 use uuid::Uuid;
+use std::sync::Arc;
+use serde_json::json;
 
 use crate::{
-    model::{QueryOptions, Question, UpdateQuestionSchema, DB},
+    model::{QueryOptions, Question, UpdateQuestionSchema, DB, AppState},
     response::{OneQuestionResponse, QuestionData, QuestionListResponse},
+    schema::{CreateQuestionSchema, FilterOptions, UpdateQuestionSchema},
 };
+
+fn to_question_response(question: &Question) -> QuestionResponse {
+    id: question.id.to_owned(),
+    title: question.title.to_owned(),
+    content: question.content.to_owned(),
+}
 
 pub async fn server_checker_handler() -> impl IntoResponse {
     const MESSAGE: &str = "Server is up and running";

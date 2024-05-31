@@ -1,7 +1,15 @@
 use crate::model::Question;
 use serde::Serialize;
 
-#[derive(Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
+pub struct QuestionResponse {
+    pub id: String,
+    pub title: String,
+    pub content: String,
+    //tags
+}
+
+/*#[derive(Serialize)]
 pub struct GenericResponse {
     pub status: String,
     pub message: String,
@@ -23,4 +31,4 @@ pub struct QuestionListResponse {
     pub status: String,
     pub results: usize,
     pub questions: Vec<Question>,
-}
+}*/

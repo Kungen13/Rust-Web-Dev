@@ -1,10 +1,15 @@
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tokio::sync::Mutex;
+use crate::MySqlPool;
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct AppState {
+    db: MySqlPool,
+}
+
+#[derive(Debug, Deserialize, Serialize, sqlx::FromRow)] //removed clone
 pub struct Question {
-    pub id: Option<String>,
+    pub id: String,
     pub title: String,
     pub content: String,
     //pub tags: Option<Vec<String>>,
