@@ -71,138 +71,223 @@ pub async fn question_list_handler (
     Ok(Json(json_response))
 }
 
-/*pub async fn question_list_handler(
-    options: Option<Query<QueryOptions>>,
-    State(db): State<DB>,
-) -> impl IntoResponse {
-    let questions = db.lock().await;
+pub async fn get_question_handler(
+    Path(id): Path<uuid::Uuid>,
+    State(data): State<Arc<Appstate>>,
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+    let query_result = sqlx::query_as!(
+        Question,
+        r#"SELECT * FROM questions WHERE id = ?"#,
+        id.to_string()
+    )
+    .fetch_one(&data.db)
+    .await;
 
-    let Query(options) = options.unwrap_or_default();
-
-    let limit = options.limit.unwrap_or(10);
-    let offset = (options.page.unwrap_or(1) - 1) * limit;
-
-    let questions: Vec<Question> = questions.clone().into_iter().skip(offset).take(limit).collect();
-
-    let json_response = QuestionListResponse {
-        status: "success".to_string(),
-        results: questions.len(),
-        questions,
+    match query_result {
+        Ok(question) => {
+            let question_response = serde_json::json!({
+                "status": "success",
+                "data": serde_json::json!({
+                    "question": to_question_response(&question)
+                })
+            });
+            return Ok(Json(question_response));
+        }
+        Err(sqlx::Error::RowNotFound) => {
+            let error_response = serde_json::json!({
+                "status": "Get question failed",
+                "message": formate!("Question with ID: {} not found", id)
+            });
+            return Err((StatusCode::NOT_FOUND, Json(error_response)));
+        }
+        Err(e) => {
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({
+                    "status": "error",
+                    "message": formate!("{:?}", e)
+                })),
+            ));
+        }
     };
-
-    Json(json_response)
 }
 
 pub async fn create_question_handler(
-    State(db): State<DB>,
-    Json(mut body): Json<Question>,
+    State(data): State<Arc<Appstate>>,
+    Json(body): Json<CreateQuestionSchema>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    let mut vec = db.lock().await;
+    let id = uuid::Uuid::new_v4().to_string();
+    let query_result = sqlx::query(r#"INSERT INTO questions (id, title, content) VALUES (?, ?, ?)"#)
+        .bind(id.clone())
+        .bind(body.title.to_string())
+        .bind(body.content.to_string())
+        .execute(&data.db)
+        .await
+        .map_err(|err: sqlx::Error| err.to_string());
 
-    if let Some(question) = vec.iter().find(|question| question.title == body.title) {
-        let error_response = serde_json::json!({
-            "status": "fail",
-            "message": format!("Question with title: '{}' already exists", question.title),
-        });
-        return Err((StatusCode::CONFLICT, Json(error_response)));
+    //duplicate checking
+    if let Err(err) = query_result {
+        if err.contains("Duplicate entry") {
+            let error_response = serde_json::json!({
+                "status": "error",
+                "message": "Question already exists",
+            });
+            return Err((StatusCode::CONFLICT, Json(error_response)));
+        }
+
+        return Err((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({
+                "status": "error",
+                "message": format!("{:?}", err)
+            })),
+        ));
     }
 
-    let uuid_id = Uuid::new_v4();
-
-    body.id = Some(uuid_id.to_string());
-    //body.tags
+    //Get inserted question
+    let question = sqlx::query_as!(Question, r#"SELECT * FROM questions WHERE id = ?"#, id)
+        .fetch_one(&data.db)
+        .await
+        .map_err(|e| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({
+                    "status": "error",
+                    "message": format!("{:?}", e)
+                })),
+            )
+        })?;
     
-    let question = body.to_owned();
-
-    vec.push(body);
-
-    let json_response = OneQuestionResponse {
-        status: "success".to_string(),
-        data: QuestionData { question },
-    };
-
-    Ok((StatusCode::CREATED, Json(json_response)))
-}
-
-pub async fn get_question_handler(
-    Path(id): Path<Uuid>,
-    State(db): State<DB>,
-) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    let id = id.to_string();
-    let vec = db.lock().await;
-
-    if let Some(question) = vec.iter().find(|question| question.id == Some(id.to_owned())) {
-        let json_response = OneQuestionResponse {
-            status: "success".to_string(),
-            data: QuestionData { question: question.clone() },
-        };
-        return Ok((StatusCode::OK, Json(json_response)));
-    }
-
-    let error_response = serde_json::json!({
-        "status": "fail",
-        "message": format!("Question with ID: {} not found", id)
+    let question_response = serde_json::json!({
+        "status": "success",
+        "data": serde_json::json!({
+            "question": to_question_response(&question)
+        })
     });
-    Err((StatusCode::NOT_FOUND, Json(error_response)))
+    
+    Ok(Json(question_response))
 }
 
-pub async fn update_question_handler(
-    Path(id): Path<Uuid>,
-    State(db): State<DB>,
+pub async fn edit_question_handler(
+    Path(id): Path<uuid::Uuid>,
+    State(data): State<Arc<AppState>>,
     Json(body): Json<UpdateQuestionSchema>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    let id = id.to_string();
-    let mut vec = db.lock().await;
+    //validate note, query macro
+    let query_result = sqlx::query_as!(
+        Question,
+        r#"SELECT * FROM questions WHERE id = ?"#,
+        id.to_string()
+    )
+    .fetch_one(&data.db)
+    .await;
 
-    if let Some(question) = vec.iter_mut().find(|question| question.id == Some(id.clone())) {
-        let title = body.title.to_owned().unwrap_or_else(|| question.title.to_owned());
-        let content = body.content.to_owned().unwrap_or_else(|| question.content.to_owned());
+    //fetch result
+    let question = match query_result {
+        Ok(question) => question,
+        Err(sqlx::Error::RowNotFound) => {
+            let error_response = serde_json::json!({
+                "status": "error",
+                "message": format!("Question with ID: {} not found", id)
+            });
+            return Err((StatusCode::NOT_FOUND, Json(error_response)));
+        }
+        Err(e) => {
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({
+                    "status": "error",
+                    "message": format!("{:?}", e)
+                })),
+            ));
+        }
+    };
 
-        let payload = Question {
-            id: question.id.to_owned(),
-            title: if !title.is_empty() {
-                title
-            } else {
-                question.title.to_owned()
-            },
-            content: if !content.is_empty() {
-                content
-            } else {
-                question.content.to_owned()
-            },
-            //tags: 
-        };
-        *question = payload;
-
-        let json_response = OneQuestionResponse {
-            status: "success".to_string(),
-            data: QuestionData { question: question.clone() },
-        };
-        Ok((StatusCode::OK, Json(json_response)))
-    } else {
+    //update
+    let update_result =
+        sqlx::query(r#"UPDATE questions SET title = >, content = ? WHERE id = ?"#)
+            .bind(body.title.to_owned().unwrap_or_else(|| question.title.clone()))
+            .bind(
+                body.content
+                    .to_owned()
+                    .unwrap_or_else(|| question.content.clone()),
+            )
+            .bind(id.to_string())
+            .execute(&data.db)
+            .await
+            .map_err(|e| {
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(json!({
+                        "status": "error",
+                        "message": format!("{:?}", e)
+                    })),
+                )
+            })?;
+        
+    //if nothing effected
+    if update_result.rows_affected() == 0 {
         let error_response = serde_json::json!({
-            "status": "fail",
+            "status": "error",
             "message": format!("Question with ID: {} not found", id)
         });
-        Err((StatusCode::NOT_FOUND, Json(error_response)))
+        return Err((StatusCode::NOT_FOUND, Json(error_response)));
     }
+
+    //get update data
+    let updated_question = sqlx::query_as!(
+        Question,
+        r#"SELECT * FROM questions WHERE id = ?"#,
+        id.to_string()
+    )
+    .fetch_one(&data.db)
+    .await
+    .map_err(|e| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({
+                "status": "error",
+                "message": format!("{:?}", e)
+            })),
+        )
+    })?;
+
+    let question_response =serde_json::json!({
+        "status": "success",
+        "data": serde_json::json!({
+            "question": to_question_response(&updated_question)
+        })
+    });
+
+    Ok(Json(question_response))
 }
 
 pub async fn delete_question_handler(
-    Path(id): Path<Uuid>,
-    State(db): State<DB>,
-) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    let id = id.to_string();
-    let mut vec = db.lock().await;
+    Path(id): Path<uuid::Uuid>,
+    State(data): State<Arc<Appstate>>,
+) -> Result<imple IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+    //delete query, macro
+    let query_result = sqlx::query!(#r"DELETE FROM questions WHERE id = ?"#, id.to_string())
+        .execute(&data.db)
+        .await
+        .map_err(|e| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({
+                    "status": "error",
+                    "message": format!("{:?}", e)
+                })),
+            )
+        })?;
 
-    if let Some(pos) = vec.iter().position(|question| question.id == Some(id.clone())) {
-        vec.remove(pos);
-        return Ok((StatusCode::NO_CONTENT, Json("")));
+    //response
+    if query_result.rows_affected() == 0 {
+        let error_response = serde_json::json!({
+            "status": "error",
+            "message": "format!(Question with ID: {} not found", id
+        });
+        return Err((StatusCode::NOT_FOUND, Json(error_response)));
     }
 
-    let error_response = serde_json::json!({
-        "status": "fail",
-        "message": format!("Question with ID: {} not found", id)
-    });
-    Err((StatusCode::NOT_FOUND, Json(error_response)))
-}*/
+    Ok(StatusCode::NO_CONTENT)
+}
