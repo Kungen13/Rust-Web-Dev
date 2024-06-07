@@ -1,0 +1,37 @@
+<html>
+  <head>
+    <title>Knock-Knock</title>
+    <link rel="stylesheet" href="{{stylesheet}}">
+  </head>
+  <body>
+  <h1>Knock-Knock</h1>
+  {%- if let Some(thejoke) = joke -%}
+  <div class="joke">
+      <span class="teller">Knock-Knock!</span><br/>
+      <span class="tellee">Who's there?</span><br/>
+      <span class="teller">{{thejoke.whos_there}}</span><br/>
+      <span class="tellee">{{thejoke.whos_there}} who?</span><br/>
+      <span class="teller">{{thejoke.answer_who}}</span><br/>
+  </div>
+  <span class="annotation">
+    [id: {{thejoke.id -}}
+    {%- if let Some(tags) = tags -%}; tags={{- tags -}}{%- endif -%}
+    {%- if let Some(source) = thejoke.source %}; source={{- source -}}{%- endif -%}
+    ]
+  {%- endif -%}
+  </span><br/><br/>
+  <form method="get" action="/">
+  <input type="submit" value="Tell me another!"/>
+  </form>
+  <form method="get" action="/tell">
+  <input type="submit" value="Ask me for one!"/>
+  </form>
+  <form method="get" action="/">
+  <input type="text" name="id"/>
+  <input type="submit" value="Find this joke"/>
+  </form>
+  {%- if let Some(error) = error -%}
+  <div class="error">{{error}}</div>
+  {%- endif -%}
+  </body>
+</html>
