@@ -1,0 +1,10 @@
+/mnt/c/Users/taylo/Documents/GitHub/Rust-Web-Dev/Front-end/target/wasm32-unknown-unknown/debug/deps/libgloo_storage-f4b091d9af074510.rmeta: /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-storage-0.3.0/src/lib.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-storage-0.3.0/src/errors.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-storage-0.3.0/src/local_storage.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-storage-0.3.0/src/session_storage.rs
+
+/mnt/c/Users/taylo/Documents/GitHub/Rust-Web-Dev/Front-end/target/wasm32-unknown-unknown/debug/deps/libgloo_storage-f4b091d9af074510.rlib: /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-storage-0.3.0/src/lib.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-storage-0.3.0/src/errors.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-storage-0.3.0/src/local_storage.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-storage-0.3.0/src/session_storage.rs
+
+/mnt/c/Users/taylo/Documents/GitHub/Rust-Web-Dev/Front-end/target/wasm32-unknown-unknown/debug/deps/gloo_storage-f4b091d9af074510.d: /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-storage-0.3.0/src/lib.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-storage-0.3.0/src/errors.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-storage-0.3.0/src/local_storage.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-storage-0.3.0/src/session_storage.rs
+
+/home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-storage-0.3.0/src/lib.rs:
+/home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-storage-0.3.0/src/errors.rs:
+/home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-storage-0.3.0/src/local_storage.rs:
+/home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-storage-0.3.0/src/session_storage.rs:

@@ -1,0 +1,11 @@
+/mnt/c/Users/taylo/Documents/GitHub/Rust-Web-Dev/Front-end/target/wasm32-unknown-unknown/debug/deps/libgloo_file-a66be911e6baa3f4.rmeta: /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/lib.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/blob.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/file_list.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/file_reader.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/object_url.rs
+
+/mnt/c/Users/taylo/Documents/GitHub/Rust-Web-Dev/Front-end/target/wasm32-unknown-unknown/debug/deps/libgloo_file-a66be911e6baa3f4.rlib: /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/lib.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/blob.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/file_list.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/file_reader.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/object_url.rs
+
+/mnt/c/Users/taylo/Documents/GitHub/Rust-Web-Dev/Front-end/target/wasm32-unknown-unknown/debug/deps/gloo_file-a66be911e6baa3f4.d: /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/lib.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/blob.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/file_list.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/file_reader.rs /home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/object_url.rs
+
+/home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/lib.rs:
+/home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/blob.rs:
+/home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/file_list.rs:
+/home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/file_reader.rs:
+/home/kungen/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gloo-file-0.3.0/src/object_url.rs:
