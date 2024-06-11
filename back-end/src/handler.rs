@@ -10,14 +10,16 @@ use serde_json::json;
 
 use crate::{
     model::{QueryOptions, Question, UpdateQuestionSchema, DB, AppState},
-    response::{OneQuestionResponse, QuestionData, QuestionListResponse},
+    response::{QuestionResponse, OneQuestionResponse, QuestionData, QuestionListResponse},
     schema::{CreateQuestionSchema, FilterOptions, UpdateQuestionSchema},
 };
 
 fn to_question_response(question: &Question) -> QuestionResponse {
-    id: question.id.to_owned(),
-    title: question.title.to_owned(),
-    content: question.content.to_owned(),
+    QuestionResponse {
+        id: question.id.to_owned(),
+        title: question.title.to_owned(),
+        content: question.content.to_owned(),
+    }
 }
 
 pub async fn server_checker_handler() -> impl IntoResponse {
@@ -34,7 +36,7 @@ pub async fn server_checker_handler() -> impl IntoResponse {
 pub async fn question_list_handler (
     opts: Option<Query<FilterOptions>>,
     State(data): State<Arc<AppState>>,
-) -> Result<imple IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
     let Query(opts) = opts.unwrap_or_default();
 
     let limit = opts.limit.unwrap_or(10);
@@ -265,7 +267,7 @@ pub async fn edit_question_handler(
 pub async fn delete_question_handler(
     Path(id): Path<uuid::Uuid>,
     State(data): State<Arc<Appstate>>,
-) -> Result<imple IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
     //delete query, macro
     let query_result = sqlx::query!(#r"DELETE FROM questions WHERE id = ?"#, id.to_string())
         .execute(&data.db)

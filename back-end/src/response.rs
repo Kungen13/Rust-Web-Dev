@@ -1,5 +1,5 @@
 use crate::model::Question;
-use serde::Serialize;
+use serde::{ Serialize, Deserialize };
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct QuestionResponse {
